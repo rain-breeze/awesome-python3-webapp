@@ -1,23 +1,22 @@
-import asyncio
+import logging;
+
+logging.basicConfig(level=logging.INFO)
+import asyncio, os, json, time
+from datetime import datetime
 from aiohttp import web
 
+routes = web.RouteTableDef()
+
+
+@routes.get('/')
 async def index(request):
-    await asyncio.sleep(0.5)
-    return web.Response(body=b'<h1>Index</h1>')
+    return web.Response(body=b'<h1>Awesome</h1>', content_type='text/html')
 
-async def hello(request):
-    await asyncio.sleep(0.5)
-    text = '<h1>hello, %s!</h1>' % request.match_info['name']
-    return web.Response(body=text.encode('utf-8'))
 
-async def init(loop):
-    app = web.Application(loop=loop)
-    app.router.add_route('GET', '/', index)
-    app.router.add_route('GET', '/hello/{name}', hello)
-    srv = await loop.create_server(app.make_handler(), '127.0.0.1', 8000)
-    print('Server started at http://127.0.0.1:8000...')
-    return srv
+async def my_app():
+    app = web.Application()
+    app.add_routes(routes)
+    return app
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(init(loop))
-loop.run_forever()
+
+web.run_app(my_app(), host='127.0.0.1', port=9000)
